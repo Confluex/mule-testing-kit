@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
  * of messages have passed through the endpoint.
  */
 @Slf4j
-public class EndpointListener implements EndpointMessageNotificationListener<EndpointMessageNotification> {
+public class BlockingEndpointListener implements EndpointMessageNotificationListener<EndpointMessageNotification> {
 
     final String endpointName
     final CountDownLatch latch
@@ -27,7 +27,7 @@ public class EndpointListener implements EndpointMessageNotificationListener<End
      * @param endpointName the name of the GLOBAL endpoint
      * @param expectedCount the number of expected messages (default = 1)
      */
-    public EndpointListener(String endpointName, Integer expectedCount = 1) {
+    public BlockingEndpointListener(String endpointName, Integer expectedCount = 1) {
         this.endpointName = endpointName;
         this.latch = new CountDownLatch(expectedCount)
     }

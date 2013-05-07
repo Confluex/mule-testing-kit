@@ -8,12 +8,12 @@ import org.mule.context.notification.EndpointMessageNotification
 
 import static org.mockito.Mockito.*
 
-class EndpointListenerTest {
-    EndpointListener listener
+class BlockingEndpointListenerTest {
+    BlockingEndpointListener listener
 
     @Before
     void createListener() {
-        listener = new EndpointListener("foo")
+        listener = new BlockingEndpointListener("foo")
     }
 
     @Test
