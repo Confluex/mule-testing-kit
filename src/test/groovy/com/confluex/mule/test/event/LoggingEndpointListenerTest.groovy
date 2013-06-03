@@ -3,6 +3,7 @@ package com.confluex.mule.test.event
 import org.junit.Before
 import org.junit.Test
 import org.mule.api.MuleMessage
+import org.mule.api.construct.FlowConstruct
 import org.mule.context.notification.EndpointMessageNotification
 import org.slf4j.Logger
 
@@ -12,6 +13,7 @@ class LoggingEndpointListenerTest {
     LoggingEndpointListener listener
     MuleMessage message
     EndpointMessageNotification notification
+    FlowConstruct flow
 
 
     @Before
@@ -19,10 +21,13 @@ class LoggingEndpointListenerTest {
         listener = new LoggingEndpointListener(log: mock(Logger))
         notification = mock(EndpointMessageNotification)
         message = mock(MuleMessage)
+        flow = mock(FlowConstruct)
         when(notification.source).thenReturn(message)
-        when(message.uniqueId).thenReturn("testId")
         when(notification.endpoint).thenReturn("testEndpoint")
-        when(notification.type).thenReturn("testType")
+        when(notification.actionName).thenReturn("testAction")
+        when(notification.flowConstruct).thenReturn(flow)
+        when(flow.name).thenReturn("testFlowName")
+        when(message.uniqueId).thenReturn("testId")
         when(message.payloadAsString).thenReturn("testPayload")
     }
 
@@ -30,7 +35,7 @@ class LoggingEndpointListenerTest {
     void shouldLogPayloadIfEnabled() {
         listener.logPayload = true
         listener.onNotification(notification)
-        verify(listener.log).debug("endpoint={} id={} type={}", "testEndpoint", "testId", "testType")
+        verify(listener.log).debug("endpoint={} id={} action={} flow={}", "testEndpoint", "testId", "testAction", "testFlowName")
         verify(listener.log).debug("endpoint={} id={} payload={}", "testEndpoint", "testId", "testPayload")
     }
 
@@ -38,7 +43,7 @@ class LoggingEndpointListenerTest {
     void shouldNotLogPayloadIfDisabled() {
         listener.logPayload = false
         listener.onNotification(notification)
-        verify(listener.log).debug("endpoint={} id={} type={}", "testEndpoint", "testId", "testType")
+        verify(listener.log).debug("endpoint={} id={} action={} flow={}", "testEndpoint", "testId", "testAction", "testFlowName")
         verify(listener.log, never()).debug(eq("endpoint={} id={} payload={}"), anyString(), anyString(), anyString())
     }
 
@@ -60,6 +65,6 @@ class LoggingEndpointListenerTest {
     void shouldLogIfEndpointNameIsCorrect() {
         listener.endpointName = "testEndpoint"
         listener.onNotification(notification)
-        verify(listener.log).debug("endpoint={} id={} type={}", "testEndpoint", "testId", "testType")
+        verify(listener.log).debug("endpoint={} id={} action={} flow={}", "testEndpoint", "testId", "testAction", "testFlowName")
     }
 }
