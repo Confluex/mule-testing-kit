@@ -17,10 +17,10 @@ class LoggingEndpointListener implements EndpointMessageNotificationListener<End
     @Override
     void onNotification(EndpointMessageNotification notification) {
         if (!endpointName || notification.endpoint == endpointName) {
-            log.debug("endpoint={} id={} type={}", notification.endpoint, notification.source.correlationId, notification.type,)
+            log.debug("endpoint={} id={} type={}", notification.endpoint, notification.source.uniqueId, notification.type,)
             //don't invoke payloadAsString
             if (logPayload) {
-                log.debug("endpoint={} id={} payload={}", notification.endpoint, notification.source.correlationId, notification.source.payloadAsString)
+                log.debug("endpoint={} id={} payload={}", notification.endpoint, notification.source.uniqueId, notification.source.payloadAsString)
             }
         }
 

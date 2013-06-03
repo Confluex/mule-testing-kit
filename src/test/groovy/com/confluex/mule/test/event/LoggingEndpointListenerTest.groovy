@@ -20,7 +20,7 @@ class LoggingEndpointListenerTest {
         notification = mock(EndpointMessageNotification)
         message = mock(MuleMessage)
         when(notification.source).thenReturn(message)
-        when(message.correlationId).thenReturn("testId")
+        when(message.uniqueId).thenReturn("testId")
         when(notification.endpoint).thenReturn("testEndpoint")
         when(notification.type).thenReturn("testType")
         when(message.payloadAsString).thenReturn("testPayload")
