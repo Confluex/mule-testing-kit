@@ -1,6 +1,5 @@
 package com.confluex.mule.test.event
 
-import groovy.util.logging.Slf4j
 import org.mule.api.context.notification.EndpointMessageNotificationListener
 import org.mule.context.notification.EndpointMessageNotification
 import org.slf4j.Logger
@@ -18,7 +17,7 @@ class LoggingEndpointListener implements EndpointMessageNotificationListener<End
     @Override
     void onNotification(EndpointMessageNotification notification) {
         if (!endpointName || notification.endpoint == endpointName) {
-            log.debug("endpoint={} id={} type={}", notification.endpoint,  notification.source.correlationId, notification.type,)
+            log.debug("endpoint={} id={} type={}", notification.endpoint, notification.source.correlationId, notification.type,)
             //don't invoke payloadAsString
             if (logPayload) {
                 log.debug("endpoint={} id={} payload={}", notification.endpoint, notification.source.correlationId, notification.source.payloadAsString)
