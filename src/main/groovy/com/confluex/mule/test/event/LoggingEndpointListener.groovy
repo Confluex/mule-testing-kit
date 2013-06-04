@@ -17,16 +17,45 @@ class LoggingEndpointListener implements EndpointMessageNotificationListener<End
     String endpointName
     Boolean logPayload = false
     Lock lock = new ReentrantLock()
+    Map<String, Date> timeTracker = [:]
 
     @Override
     void onNotification(EndpointMessageNotification notification) {
         if (!endpointName || notification.endpoint == endpointName) {
-            log.debug("endpoint={},id={},flow={},action={}", notification.endpoint, notification.source.uniqueId, notification.flowConstruct.name, notification.actionName)
+            def id = notification.source.uniqueId
+            def flow = notification.flowConstruct.name
+            def action = notification.actionName
+            def endpoint = notification.endpoint
+            def lastSeen = findLastSeenInSecs(id)
+            log.debug("endpoint={},id={},flow={},lastSeen={},action={}", endpoint, id, flow, lastSeen, action)
             //don't invoke payloadAsString
             if (logPayload) {
-                log.debug("endpoint={},id={},payload={}", notification.endpoint, notification.source.uniqueId, notification.source.payloadAsString)
+                log.debug("endpoint={},id={},payload={}", endpoint, id, notification.source?.payloadAsString)
             }
         }
 
+    }
+
+    protected Long findLastSeenInSecs(String id) {
+        def now = new Date()
+        doWithLock {
+            def lastSeen = timeTracker[id]
+            timeTracker[id] = now
+            if (!lastSeen) {
+                return 0
+            }
+            return now.time - lastSeen.time
+        }
+
+    }
+
+    def doWithLock = { closure ->
+        try {
+            lock.lock()
+            closure()
+        }
+        finally {
+            lock.unlock()
+        }
     }
 }
