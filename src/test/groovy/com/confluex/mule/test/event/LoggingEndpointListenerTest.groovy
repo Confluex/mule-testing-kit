@@ -35,36 +35,36 @@ class LoggingEndpointListenerTest {
     void shouldLogPayloadIfEnabled() {
         listener.logPayload = true
         listener.onNotification(notification)
-        verify(listener.log).debug("endpoint={} id={} action={} flow={}", "testEndpoint", "testId", "testAction", "testFlowName")
-        verify(listener.log).debug("endpoint={} id={} payload={}", "testEndpoint", "testId", "testPayload")
+        verify(listener.log).debug("endpoint={},id={},flow={},action={}", "testEndpoint", "testId", "testFlowName", "testAction")
+        verify(listener.log).debug("endpoint={},id={},payload={}", "testEndpoint", "testId", "testPayload")
     }
 
     @Test
     void shouldNotLogPayloadIfDisabled() {
         listener.logPayload = false
         listener.onNotification(notification)
-        verify(listener.log).debug("endpoint={} id={} action={} flow={}", "testEndpoint", "testId", "testAction", "testFlowName")
-        verify(listener.log, never()).debug(eq("endpoint={} id={} payload={}"), anyString(), anyString(), anyString())
+        verify(listener.log).debug("endpoint={},id={},flow={},action={}", "testEndpoint", "testId", "testFlowName", "testAction")
+        verify(listener.log, never()).debug(eq("endpoint={},id={},payload={}"), anyString(), anyString(), anyString())
     }
 
     @Test
     void shouldLogIfEndpointNameIsNotConfigured() {
         listener.endpointName = null
         listener.onNotification(notification)
-        verify(listener.log, never()).debug(eq("endpoint={} id={} type={}"), anyString(), anyString(), anyString())
+        verify(listener.log, never()).debug("endpoint={},id={},flow={},action={}", "testEndpoint", "testId", "testFlowName", "testAction")
     }
 
     @Test
     void shouldNotLogIfEndpointNameIsNotNotCorrect() {
         listener.endpointName = "notTheCorrectEndpoint"
         listener.onNotification(notification)
-        verify(listener.log, never()).debug(eq("endpoint={} id={} type={}"), anyString(), anyString(), anyString())
+        verify(listener.log, never()).debug("endpoint={},id={},flow={},action={}", "testEndpoint", "testId", "testFlowName", "testAction")
     }
 
     @Test
     void shouldLogIfEndpointNameIsCorrect() {
         listener.endpointName = "testEndpoint"
         listener.onNotification(notification)
-        verify(listener.log).debug("endpoint={} id={} action={} flow={}", "testEndpoint", "testId", "testAction", "testFlowName")
+        verify(listener.log).debug("endpoint={},id={},flow={},action={}", "testEndpoint", "testId", "testFlowName", "testAction")
     }
 }
