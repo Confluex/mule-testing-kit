@@ -18,6 +18,8 @@ class LoggingEndpointListener implements EndpointMessageNotificationListener<End
     Boolean logPayload = false
     Lock lock = new ReentrantLock()
     Map<String, Date> timeTracker = [:]
+    String delimiter = ","
+    Long minLastSeen = 0
 
     @Override
     void onNotification(EndpointMessageNotification notification) {
@@ -27,11 +29,14 @@ class LoggingEndpointListener implements EndpointMessageNotificationListener<End
             def action = notification.actionName
             def endpoint = notification.endpoint
             def lastSeen = findLastSeenInSecs(id)
-            log.debug("endpoint={},id={},flow={},lastSeen={},action={}", endpoint, id, flow, lastSeen, action)
-            //don't invoke payloadAsString
-            if (logPayload) {
-                log.debug("endpoint={},id={},payload={}", endpoint, id, notification.source?.payloadAsString)
+            if (lastSeen >= minLastSeen) {
+                log.debug("endpoint={}${delimiter}id={}${delimiter}flow={}${delimiter}lastSeen={}${delimiter}action={}", endpoint, id, flow, lastSeen, action)
+                //be careful invoking payloadAsString, it may consume streams, etc.
+                if (logPayload) {
+                    log.debug("endpoint={}${delimiter}id={}${delimiter}payload={}", endpoint, id, notification.source?.payloadAsString)
+                }
             }
+
         }
 
     }
