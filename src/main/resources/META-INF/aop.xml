@@ -1,0 +1,12 @@
+<!DOCTYPE aspectj PUBLIC
+        "-//AspectJ//DTD//EN" "http://www.eclipse.org/aspectj/dtd/aspectj.dtd">
+<aspectj>
+    <weaver options="-showWeaveInfo -debug -verbose -XmessageHandlerClass:org.springframework.aop.aspectj.AspectJWeaverMessageHandler">
+        <include within="org.mule..*"/>
+        <exclude within="org.mule.util..*"/>
+    </weaver>
+    <aspects>
+        <aspect name="com.confluex.mule.test.event.LoggingMessageProcessorAspect"/>
+        <include within="com.confluex..*"/>
+    </aspects>
+</aspectj>
