@@ -52,7 +52,7 @@ public class BlockingEndpointListener implements EndpointMessageNotificationList
      * @param timeout the number of ms to wait until we give up
      * @return true if all expected messages have flowed through. false if timed out.
      */
-    public Boolean waitForMessage(long timeout = 10000) {
+    public Boolean waitForMessages(long timeout = 10000) {
         log.info("Waiting for latch to release with {} messages remaining", latch.count)
         return latch.await(timeout, TimeUnit.MILLISECONDS)
     }
