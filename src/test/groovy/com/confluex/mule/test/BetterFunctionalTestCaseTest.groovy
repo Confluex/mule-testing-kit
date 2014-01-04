@@ -7,13 +7,12 @@ import org.mule.api.MuleContext
 import org.mule.api.lifecycle.Disposable
 import org.mule.api.lifecycle.Initialisable
 import org.mule.api.lifecycle.Startable
-import org.mule.api.lifecycle.Stoppable
 
 class BetterFunctionalTestCaseTest extends BetterFunctionalTestCase {
     String beforeMulePhase
     String beforePhase
-    String expectedAfterPhase
-    String expectedAfterMulePhase
+    Closure afterPhaseAssertion
+    Closure afterMulePhaseAssertion
 
     @Override
     protected String getConfigResources() {
@@ -32,12 +31,12 @@ class BetterFunctionalTestCaseTest extends BetterFunctionalTestCase {
 
     @After
     void capturePhaseNameAfterTestMethod() {
-        assert muleContext.lifecycleManager.currentPhase == expectedAfterPhase
+        afterPhaseAssertion?.call()
     }
 
     @AfterMule
     void capturePhaseNameAfterMuleStops() {
-        assert muleContext.lifecycleManager.currentPhase == expectedAfterMulePhase
+        afterMulePhaseAssertion?.call()
     }
 
     @Test
@@ -48,7 +47,11 @@ class BetterFunctionalTestCaseTest extends BetterFunctionalTestCase {
 
     @Test
     void methodsAnnotatedAfterMuleShouldRunAfterMuleContextStops() {
-        expectedAfterPhase = Startable.PHASE_NAME
-        expectedAfterMulePhase = Disposable.PHASE_NAME
+        afterPhaseAssertion = {
+            assert muleContext.lifecycleManager.currentPhase == Startable.PHASE_NAME
+        }
+        afterMulePhaseAssertion = {
+            assert muleContext.lifecycleManager.currentPhase == Disposable.PHASE_NAME
+        }
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.util.ReflectionUtils
 
 import java.lang.annotation.Annotation
+import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 
 @Slf4j
@@ -50,7 +51,11 @@ abstract class BetterFunctionalTestCase extends FunctionalTestCase {
         findAnnotatedMethods(AfterMule.class).each { method ->
             final List<Class<?>> parameterTypes = method.parameterTypes.toList()
             if (parameterTypes.empty) {
-                method.invoke(this, [] as Object[])
+                try {
+                    method.invoke(this, [] as Object[])
+                } catch (InvocationTargetException e) {
+                    throw e.cause
+                }
             } else {
                 log.error "AfterMule annotation not application to method with parameters ${StringUtils.join(parameterTypes, ',')}"
             }
