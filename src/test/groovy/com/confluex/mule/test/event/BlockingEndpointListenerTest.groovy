@@ -54,6 +54,7 @@ class BlockingEndpointListenerTest {
         def endpoint = mock(ImmutableEndpoint)
         when(notification.immutableEndpoint).thenReturn(endpoint)
         when(notification.action).thenReturn(action)
+        when(notification.source).thenReturn(mock(MuleMessage))
         when(endpoint.name).thenReturn(endpointName)
         return notification
     }
