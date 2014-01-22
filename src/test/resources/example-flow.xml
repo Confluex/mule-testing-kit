@@ -1,0 +1,38 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+">
+
+    <vm:endpoint name="inbox" path="test.inbox"/>
+    <vm:endpoint name="outbox" path="test.outbox"/>
+    <vm:endpoint name="otherInbox" path="test.other.inbox"/>
+    <vm:endpoint name="otherOutbox" path="test.other.outbox" />
+    <set-payload name="identityTransformer" value="#[payload]" />
+    <set-payload name="otherIdentityTransformer" value="#[payload]" />
+
+    <notifications dynamic="true">
+        <notification event="ENDPOINT-MESSAGE" />
+        <notification event="MESSAGE-PROCESSOR" />
+    </notifications>
+
+    <flow name="example-flow">
+        <inbound-endpoint ref="inbox"/>
+        <logger category="com.confluex.mule.test.example-flow" level="INFO" message="Message received: #[payload]"/>
+        <transformer ref="identityTransformer" />
+        <logger category="com.confluex.mule.test.example-flow" level="INFO" message="Message transformed: #[payload]"/>
+        <outbound-endpoint ref="outbox"/>
+        <logger category="com.confluex.mule.test.example-flow" level="INFO" message="Message sent: #[payload]"/>
+    </flow>
+
+    <flow name="other-example-flow">
+        <inbound-endpoint ref="otherInbox" />
+        <logger category="com.confluex.mule.test.example-flow" level="INFO" message="(OTHER) Message received: #[payload]"/>
+        <transformer ref="otherIdentityTransformer" />
+        <logger category="com.confluex.mule.test.example-flow" level="INFO" message="(OTHER) Message transformed: #[payload]"/>
+        <outbound-endpoint ref="otherOutbox" />
+        <logger category="com.confluex.mule.test.example-flow" level="INFO" message="(OTHER) Message sent: #[payload]"/>
+    </flow>
+</mule>
