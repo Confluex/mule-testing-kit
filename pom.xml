@@ -6,7 +6,7 @@
         <artifactId>mule-parent</artifactId>
         <version>0.2.0-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-tck</artifactId>
+    <artifactId>mule-testing-kit</artifactId>
     <name>Mule Testing Extensions</name>
     <dependencies>
         <dependency>
