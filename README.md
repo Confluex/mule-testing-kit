@@ -1,4 +1,4 @@
-# Confluex Test Notifications
+# Mule Testing Extensions
 
 Since the MuleFunctionalTest runs in a separate thread from the server, it's often
 difficult to determine when the messages are finished and when to start your assertions (usually by waiting or
