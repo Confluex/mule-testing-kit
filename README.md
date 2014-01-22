@@ -8,8 +8,8 @@ thread running your FunctionalTestCase test until certain things happen in the M
 
 **BlockingEndpointListener**
 
-This event listener will attach to an endpoint and allow your test to wait and collect the messages sent to the endpoint.
-The following example configuration and test case demonstrate the basic usage:
+This event listener will attach to an endpoint and allow your test to wait and collect the messages processed by
+the endpoint. The following example configuration and test case demonstrate basic usage:
 
 _Mule Configuration_
 
@@ -62,6 +62,59 @@ public class MyFlowFunctionalTest extends FunctionalTestCase {
 }
 ```
 
+When you expect a certain number of messages to be sent before you are ready to make assertions, you can set up the
+listener to wait for multiple messages:
+
+```java
+
+    BlockingEndpointListener listener = new BlockingEndpointListener("updateOrderJdbcEndpoint", 16);
+    muleContext.registerListener(listener);
+```
+
+Subsequent calls for waitForMessages() will block until 16 messages are received.
+
+You can also control the amount of time the listener will wait before giving up and returning false:
+
+```java
+    listener.waitForMessages(500); // this waits for 500ms instead of the default 10s.
+```
+
+**BlockingMessageProcessorListener**
+
+Sometimes you need to wait for a MessageProcessor to handle a message before your test method continues.  For example,
+many Cloud Connectors provide their functionality as a MessageProcessor, not an endpoint.  For these cases, we provide
+BlockingMessageProcessorListener, which works pretty much like the BlockingEndpointListener.  You do need to remember
+to enable dynamic notification for MESSAGE_PROCESSOR events:
+
+ ```xml
+ <mule>
+     <notifications dynamic="true">
+         <notification event="ENDPOINT-MESSAGE" />
+         <notification event="MESSAGE-PROCESSOR" />
+     </notifications>
+ </mule>
+ ```
+
+**Convenience Methods in BetterFunctionalTestCase**
+
+Because we use these so often, we built a couple of convenience methods into BetterFunctionalTestCase:
+
+```java
+import com.confluex.mule.test.BetterFunctionalTestCase;
+
+public class MyFlowFunctionalTest extends BetterFunctionalTestCase {
+
+    @Test
+    public void shouldDoAmazingIntegration() {
+        BlockingMessageProcessorListener mongoInsertListener = listenForMessageProcessor("insertMongoCollectionProcessor");
+        // the convenience method registers the listener with the muleContext for you
+
+        BlockingEndpointListener insertQueryListener = listenForEndpoint("insertQueryEndpoint", 10);
+    }
+}
+
+```
+
 ## Setting up and cleaning up
 
 Normally we can use the @Before and @After annotations provided by junit to set up before each test method, and clean
@@ -69,7 +122,8 @@ up afterwards.  When we use these annotations with Mule's FunctionalTestCase, th
 initialized before it runs our @Before methods, and it makes sure our @After methods run before Mule stops.
 
 Sometimes, however, we want to do things before Mule starts or after Mule stops.  For these scenarios, we extend Mule's
-FunctionalTestCase and provide two new annotations: @BeforeMule and @AfterMule.
+FunctionalTestCase and provide two new annotations: @BeforeMule and @AfterMule.  In order to take advantage of these,
+you need to extend BetterFunctionalTestCase instead of FunctionalTestCase.
 
 _@BeforeMule_
 Methods annotated with @BeforeMule will be run after the configuration files are processed and the Spring context is
