@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 	<groupId>com.confluex</groupId>
     <artifactId>mule-testing-kit</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>Mule Testing Extensions</name>
     <url>https://github.com/Confluex/mule-testing-kit</url>
     <description>Tools for making automated testing with Mule ESB easier</description>
@@ -36,6 +36,18 @@
             <email>gorshing@gmail.com</email>
         </developer>
     </developers>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
     <properties>
 		<mule.version>3.4.1</mule.version>
 	</properties>
@@ -136,4 +148,94 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <!-- for releasing to the Sonatype OSS repo (sync with central repo) -->
+        <profile>
+            <id>sonatype</id>
+            <repositories>
+                <repository>
+                    <id>sonatype-public</id>
+                    <name>Sonatype OSS Maven Repo (snapshots)</name>
+                    <url>https://oss.sonatype.org/content/groups/public</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                </repository>
+            </repositories>
+            <dependencies>
+                <dependency>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-all</artifactId>
+                    <version>1.8.6</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>groovydoc</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <!--suppress MavenModelInspection -->
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <taskdef name="groovydoc" classname="org.codehaus.groovy.ant.Groovydoc" classpathref="maven.compile.classpath" />
+                                        <groovydoc destdir="${project.reporting.outputDirectory}/groovydoc" sourcepath="${basedir}/src/main/groovy" use="true" windowtitle="${project.name}" doctitle="${project.name}" />
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>2.4</version>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <!--suppress MavenModelInspection -->
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classesDirectory>${project.reporting.outputDirectory}/groovydoc</classesDirectory>
+                                    <classifier>javadoc</classifier>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <keyname>Confluex</keyname>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
