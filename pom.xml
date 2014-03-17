@@ -189,7 +189,20 @@
                                 <configuration>
                                     <target>
                                         <taskdef name="groovydoc" classname="org.codehaus.groovy.ant.Groovydoc" classpathref="maven.compile.classpath" />
-                                        <groovydoc destdir="${project.reporting.outputDirectory}/groovydoc" sourcepath="${basedir}/src/main/groovy" use="true" windowtitle="${project.name}" doctitle="${project.name}" />
+                                        <groovydoc destdir="${project.reporting.outputDirectory}/groovydoc" packagenames="com.confluex.*" sourcepath="${basedir}/src/main/groovy" use="true" windowtitle="${project.name}" doctitle="${project.name}">
+                                            <link packages="java.,org.xml.,javax.,org.xml."
+                                                  href="http://download.oracle.com/javase/7/docs/api" />
+                                            <link packages="org.junit.,junit.framework."
+                                                  href="http://kentbeck.github.com/junit/javadoc/latest" />
+                                            <link packages="groovy.,org.codehaus.groovy."
+                                                  href="http://groovy.codehaus.org/api/" />
+                                            <link packages="org.codehaus.gmaven."
+                                                  href="http://evgeny-goldin.org/javadoc/gmaven" />
+                                            <link packages="org.mule.tck.,org.mule.test."
+                                                  href="http://www.mulesoft.org/docs/site/3.4.0/testapidocs/" />
+                                            <link packages="org.mule."
+                                                  href="http://www.mulesoft.org/docs/site/3.4.0/apidocs/" />
+                                        </groovydoc>
                                     </target>
                                 </configuration>
                             </execution>
