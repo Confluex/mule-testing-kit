@@ -1,5 +1,14 @@
 # Mule Testing Extensions
 
+## Setting up using maven
+```xml
+<dependency>
+    <groupId>com.confluex</groupId>
+    <artifactId>mule-testing-kit</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
 ## Making sure things are finished
 
 One of the reasons we use Mule for integration is that it handles threading for us.  This can make testing flows a
