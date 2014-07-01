@@ -11,7 +11,7 @@ import org.mule.context.notification.EndpointMessageNotification
  * of messages have passed through the endpoint.
  */
 @Slf4j
-public class BlockingEndpointMessageListener extends BaseBlockingMessageListener<EndpointMessageNotification> implements EndpointMessageNotificationListener<EndpointMessageNotification> {
+public class BlockingEndpointListener extends BaseBlockingMessageListener<EndpointMessageNotification> implements EndpointMessageNotificationListener<EndpointMessageNotification> {
 
     final String endpointName
     List<Integer> actions = [EndpointMessageNotification.MESSAGE_DISPATCHED, EndpointMessageNotification.MESSAGE_SENT]
@@ -22,7 +22,7 @@ public class BlockingEndpointMessageListener extends BaseBlockingMessageListener
      * @param endpointName the name of the GLOBAL endpoint
      * @param expectedCount the number of expected messages (default = 1)
      */
-    public BlockingEndpointMessageListener(String endpointName, Integer expectedCount = 1) {
+    public BlockingEndpointListener(String endpointName, Integer expectedCount = 1) {
         super(expectedCount)
         this.endpointName = endpointName;
     }

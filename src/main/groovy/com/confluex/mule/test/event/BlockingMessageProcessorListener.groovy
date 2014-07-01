@@ -11,7 +11,7 @@ import org.mule.context.notification.MessageProcessorNotification
  * the required number of messages have been processed.
  */
 @Slf4j
-class BlockingMessageProcessorMessageListener extends BaseBlockingMessageListener<MessageProcessorNotification> implements MessageProcessorNotificationListener<MessageProcessorNotification> {
+class BlockingMessageProcessorListener extends BaseBlockingMessageListener<MessageProcessorNotification> implements MessageProcessorNotificationListener<MessageProcessorNotification> {
     final String name
 
     /**
@@ -20,7 +20,7 @@ class BlockingMessageProcessorMessageListener extends BaseBlockingMessageListene
      * @param name the name of the message processor
      * @param expectedCount the number of expected messages (default = 1)
      */
-    public BlockingMessageProcessorMessageListener(String name, Integer expectedCount = 1) {
+    public BlockingMessageProcessorListener(String name, Integer expectedCount = 1) {
         super(expectedCount)
         this.name = name;
     }

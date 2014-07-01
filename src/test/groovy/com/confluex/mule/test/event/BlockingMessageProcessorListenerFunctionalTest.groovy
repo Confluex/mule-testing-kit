@@ -14,7 +14,7 @@ class BlockingMessageProcessorListenerFunctionalTest extends FunctionalTestCase 
 
     @Test
     void shouldNotifyWhenProcessorFinishes() {
-        BlockingMessageProcessorMessageListener listener = new BlockingMessageProcessorMessageListener('identityTransformer')
+        BlockingMessageProcessorListener listener = new BlockingMessageProcessorListener('identityTransformer')
         muleContext.registerListener listener
 
         assert 0 == listener.messages.size()
@@ -27,7 +27,7 @@ class BlockingMessageProcessorListenerFunctionalTest extends FunctionalTestCase 
 
     @Test
     void shouldNotNotifyWhenSomeOtherProcessorRuns() {
-        BlockingMessageProcessorMessageListener listener = new BlockingMessageProcessorMessageListener('identityTransformer')
+        BlockingMessageProcessorListener listener = new BlockingMessageProcessorListener('identityTransformer')
         muleContext.registerListener listener
 
         muleContext.client.dispatch('otherInbox', 'thePayload', [:])

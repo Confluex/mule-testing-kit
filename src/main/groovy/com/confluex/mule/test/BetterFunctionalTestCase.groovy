@@ -1,5 +1,8 @@
 package com.confluex.mule.test
 
+import com.confluex.mule.test.event.BlockingEndpointListener
+import com.confluex.mule.test.event.BlockingMessageProcessorListener
+import com.confluex.mule.test.event.BlockingTransactionListener
 import groovy.util.logging.Slf4j
 import org.junit.Before
 import org.mule.api.MuleContext
@@ -66,5 +69,23 @@ abstract class BetterFunctionalTestCase extends FunctionalTestCase {
         ReflectionUtils.getUniqueDeclaredMethods(this.getClass()).findAll { method ->
             null != AnnotationUtils.findAnnotation(method, annotationClass)
         }
+    }
+
+    BlockingEndpointListener listenForEndpoint(String endpoint, int expectedCount = 1) {
+        def listener = new BlockingEndpointListener(endpoint, expectedCount)
+        muleContext.registerListener(listener)
+        return listener
+    }
+
+    BlockingMessageProcessorListener listenForMessageProcessor(String messageProcessor, int expectedCount = 1) {
+        def listener = new BlockingMessageProcessorListener(messageProcessor, expectedCount)
+        muleContext.registerListener(listener)
+        return listener
+    }
+
+    BlockingTransactionListener listenForTransaction() {
+        def listener = new BlockingTransactionListener()
+        muleContext.registerListener(listener)
+        return listener
     }
 }
