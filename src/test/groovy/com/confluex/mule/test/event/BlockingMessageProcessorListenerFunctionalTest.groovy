@@ -2,20 +2,19 @@ package com.confluex.mule.test.event
 
 import groovy.util.logging.Slf4j
 import org.junit.Test
-import org.mule.construct.Flow
 import org.mule.tck.junit4.FunctionalTestCase
 
 @Slf4j
 class BlockingMessageProcessorListenerFunctionalTest extends FunctionalTestCase {
 
     @Override
-    protected String getConfigResources() {
+    public String getConfigFile() {
         'example-flow.xml'
     }
 
     @Test
     void shouldNotifyWhenProcessorFinishes() {
-        BlockingMessageProcessorListener listener = new BlockingMessageProcessorListener('identityTransformer')
+        BlockingMessageProcessorMessageListener listener = new BlockingMessageProcessorMessageListener('identityTransformer')
         muleContext.registerListener listener
 
         assert 0 == listener.messages.size()
@@ -28,7 +27,7 @@ class BlockingMessageProcessorListenerFunctionalTest extends FunctionalTestCase 
 
     @Test
     void shouldNotNotifyWhenSomeOtherProcessorRuns() {
-        BlockingMessageProcessorListener listener = new BlockingMessageProcessorListener('identityTransformer')
+        BlockingMessageProcessorMessageListener listener = new BlockingMessageProcessorMessageListener('identityTransformer')
         muleContext.registerListener listener
 
         muleContext.client.dispatch('otherInbox', 'thePayload', [:])

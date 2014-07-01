@@ -7,6 +7,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 ">
 
     <vm:endpoint name="inbox" path="test.inbox"/>
+    <vm:endpoint name="txInbox" path="test.tx.inbox"/>
     <vm:endpoint name="outbox" path="test.outbox"/>
     <vm:endpoint name="otherInbox" path="test.other.inbox"/>
     <vm:endpoint name="otherOutbox" path="test.other.outbox" />
@@ -29,10 +30,30 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 
     <flow name="other-example-flow">
         <inbound-endpoint ref="otherInbox" />
-        <logger category="com.confluex.mule.test.example-flow" level="INFO" message="(OTHER) Message received: #[payload]"/>
+        <logger category="com.confluex.mule.test.other-example-flow" level="INFO" message="(OTHER) Message received: #[payload]"/>
         <transformer ref="otherIdentityTransformer" />
-        <logger category="com.confluex.mule.test.example-flow" level="INFO" message="(OTHER) Message transformed: #[payload]"/>
+        <logger category="com.confluex.mule.test.other-example-flow" level="INFO" message="(OTHER) Message transformed: #[payload]"/>
         <outbound-endpoint ref="otherOutbox" />
-        <logger category="com.confluex.mule.test.example-flow" level="INFO" message="(OTHER) Message sent: #[payload]"/>
+        <logger category="com.confluex.mule.test.other-example-flow" level="INFO" message="(OTHER) Message sent: #[payload]"/>
+    </flow>
+
+    <flow name="transactional-flow">
+        <inbound-endpoint ref="txInbox">
+            <vm:transaction action="ALWAYS_BEGIN" />
+        </inbound-endpoint>
+        <logger category="com.confluex.mule.test.transactional-flow" level="INFO" message="Message received: #[payload]"/>
+        <choice>
+            <when expression="#[payload == 'POISON']">
+                <logger category="com.confluex.mule.test.transactional-flow" level="WARN" message="Poison message detected, self destruct sequence activated" />
+                <component class="com.confluex.mule.test.BoomComponent" />
+            </when>
+            <otherwise>
+                <logger category="com.confluex.mule.test.transactional-flow" level="DEBUG" message="Message certified poison free" />
+            </otherwise>
+        </choice>
+        <outbound-endpoint ref="outbox">
+            <vm:transaction action="ALWAYS_JOIN" />
+        </outbound-endpoint>
+        <logger category="com.confluex.mule.test.transactional-flow" level="INFO" message="Message sent: #[payload]"/>
     </flow>
 </mule>

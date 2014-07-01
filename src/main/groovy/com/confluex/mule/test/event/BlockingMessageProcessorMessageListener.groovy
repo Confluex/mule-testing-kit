@@ -3,13 +3,7 @@ package com.confluex.mule.test.event
 import groovy.util.logging.Slf4j
 import org.mule.api.MuleMessage
 import org.mule.api.context.notification.MessageProcessorNotificationListener
-import org.mule.api.context.notification.ServerNotification
-import org.mule.api.processor.MessageProcessor
-import org.mule.api.transformer.Transformer
 import org.mule.context.notification.MessageProcessorNotification
-import org.mule.transformer.AbstractTransformer
-
-import java.util.concurrent.ConcurrentLinkedQueue
 
 /**
  * This can be useful for testing events without having to modify your config files or mock out
@@ -17,7 +11,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
  * the required number of messages have been processed.
  */
 @Slf4j
-class BlockingMessageProcessorListener extends BaseBlockingListener<MessageProcessorNotification> implements MessageProcessorNotificationListener<MessageProcessorNotification> {
+class BlockingMessageProcessorMessageListener extends BaseBlockingMessageListener<MessageProcessorNotification> implements MessageProcessorNotificationListener<MessageProcessorNotification> {
     final String name
 
     /**
@@ -26,7 +20,7 @@ class BlockingMessageProcessorListener extends BaseBlockingListener<MessageProce
      * @param name the name of the message processor
      * @param expectedCount the number of expected messages (default = 1)
      */
-    public BlockingMessageProcessorListener(String name, Integer expectedCount = 1) {
+    public BlockingMessageProcessorMessageListener(String name, Integer expectedCount = 1) {
         super(expectedCount)
         this.name = name;
     }

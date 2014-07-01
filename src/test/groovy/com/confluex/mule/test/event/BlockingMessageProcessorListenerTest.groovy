@@ -11,11 +11,11 @@ import static org.mockito.Mockito.*
 
 class BlockingMessageProcessorListenerTest {
 
-    BlockingMessageProcessorListener listener
+    BlockingMessageProcessorMessageListener listener
 
     @Before
     void initListener() {
-         listener = new BlockingMessageProcessorListener('theProcessorName')
+         listener = new BlockingMessageProcessorMessageListener('theProcessorName')
     }
 
     @Test
