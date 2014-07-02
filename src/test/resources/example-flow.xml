@@ -19,6 +19,13 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <notification event="MESSAGE-PROCESSOR" />
     </notifications>
 
+
+    <configuration>
+        <expression-language>
+            <import class="org.mule.transaction.TransactionCoordination" />
+        </expression-language>
+    </configuration>
+
     <flow name="example-flow">
         <inbound-endpoint ref="inbox"/>
         <logger category="com.confluex.mule.test.example-flow" level="INFO" message="Message received: #[payload]"/>
@@ -41,6 +48,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <inbound-endpoint ref="txInbox">
             <vm:transaction action="ALWAYS_BEGIN" />
         </inbound-endpoint>
+        <set-property name="txidCapture" propertyName="txid" value="#[TransactionCoordination.getInstance().getTransaction().getId()]" />
         <logger category="com.confluex.mule.test.transactional-flow" level="INFO" message="Message received: #[payload]"/>
         <choice>
             <when expression="#[payload == 'POISON']">

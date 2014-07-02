@@ -12,9 +12,8 @@ import java.util.concurrent.TimeUnit
 @Slf4j
 class BlockingTransactionListener extends BaseBlockingEventListener<TransactionNotification> implements TransactionNotificationListener<TransactionNotification> {
 
-    String transactionId
-    Latch commitLatch
-    Latch rollbackLatch
+    Map<String, Latch> commitLatches = [:]
+    Map<String, Latch> rollbackLatches = [:]
 
     BlockingTransactionListener() {
         super(1)
@@ -28,9 +27,9 @@ class BlockingTransactionListener extends BaseBlockingEventListener<TransactionN
 
     @Override
     protected void onMatched(TransactionNotification notification) {
-        transactionId = notification.transactionStringId
-        commitLatch = new Latch()
-        rollbackLatch = new Latch()
+
+        commitLatches[notification.transactionStringId] = new Latch()
+        rollbackLatches[notification.transactionStringId] = new Latch()
     }
     /**
      * Will count down the appropriate Latch based on notifications of commit or rollback
@@ -42,15 +41,15 @@ class BlockingTransactionListener extends BaseBlockingEventListener<TransactionN
         super.onNotification(notification)
 
         if (TransactionNotification.TRANSACTION_COMMITTED == notification.action
-                && transactionId == notification.transactionStringId) {
-            log.debug("Transaction committed: $transactionId")
-            commitLatch.release()
+                && commitLatches.containsKey(notification.transactionStringId)) {
+            log.debug("Transaction committed: ${notification.transactionStringId}")
+            commitLatches[notification.transactionStringId].release()
         }
 
         if (TransactionNotification.TRANSACTION_ROLLEDBACK == notification.action
-                && transactionId == notification.transactionStringId) {
-            log.debug("Transaction rolled back: $transactionId")
-            rollbackLatch.release()
+                && rollbackLatches.containsKey(notification.transactionStringId)) {
+            log.debug("Transaction rolled back: ${notification.transactionStringId}")
+            rollbackLatches[notification.transactionStringId].release()
         }
     }
 
@@ -58,15 +57,15 @@ class BlockingTransactionListener extends BaseBlockingEventListener<TransactionN
         waitForEvents(timeout)
     }
 
-    boolean waitForCommit(long timeout = 10000) {
+    boolean waitForCommit(String transactionId, long timeout = 10000) {
         waitForTransaction(timeout)
         log.debug "Awaiting commit for transaction $transactionId"
-        commitLatch.await(timeout, TimeUnit.MILLISECONDS)
+        commitLatches[transactionId].await(timeout, TimeUnit.MILLISECONDS)
     }
 
-    boolean waitForRollback(long timeout = 10000) {
+    boolean waitForRollback(String transactionId, long timeout = 10000) {
         waitForTransaction(timeout)
         log.debug "Awaiting rollback for transaction $transactionId"
-        rollbackLatch.await(timeout, TimeUnit.MILLISECONDS)
+        rollbackLatches[transactionId].await(timeout, TimeUnit.MILLISECONDS)
     }
 }
