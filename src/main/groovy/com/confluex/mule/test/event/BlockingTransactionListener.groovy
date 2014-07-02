@@ -57,14 +57,24 @@ class BlockingTransactionListener extends BaseBlockingEventListener<TransactionN
         waitForEvents(timeout)
     }
 
+    boolean waitForTransaction(String transactionId, long timeout = 10000) {
+        long started = System.currentTimeMillis()
+        if (commitLatches.containsKey(transactionId)) {
+            return
+        }
+        Thread.sleep 200
+        long elapsed = System.currentTimeMillis() - started
+        waitForTransaction(transactionId, timeout - elapsed)
+    }
+
     boolean waitForCommit(String transactionId, long timeout = 10000) {
-        waitForTransaction(timeout)
+        waitForTransaction(transactionId, timeout)
         log.debug "Awaiting commit for transaction $transactionId"
         commitLatches[transactionId].await(timeout, TimeUnit.MILLISECONDS)
     }
 
     boolean waitForRollback(String transactionId, long timeout = 10000) {
-        waitForTransaction(timeout)
+        waitForTransaction(transactionId, timeout)
         log.debug "Awaiting rollback for transaction $transactionId"
         rollbackLatches[transactionId].await(timeout, TimeUnit.MILLISECONDS)
     }
