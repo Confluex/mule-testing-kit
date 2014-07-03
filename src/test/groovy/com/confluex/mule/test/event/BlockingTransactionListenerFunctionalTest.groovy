@@ -23,13 +23,6 @@ class BlockingTransactionListenerFunctionalTest extends FunctionalTestCase {
     }
 
     @Test
-    void shouldNotifyOnTransaction() {
-        publishToFlowAndCaptureTxId('thePayload')
-
-        assert listener.waitForTransaction(WAIT_TIME)
-    }
-
-    @Test
     void shouldNotifyOnCommit() {
         String txId = publishToFlowAndCaptureTxId('thePayload')
         assert listener.waitForCommit(txId, WAIT_TIME)

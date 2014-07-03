@@ -27,9 +27,8 @@ class BlockingTransactionListener extends BaseBlockingEventListener<TransactionN
 
     @Override
     protected void onMatched(TransactionNotification notification) {
-
-        commitLatches[notification.transactionStringId] = new Latch()
-        rollbackLatches[notification.transactionStringId] = new Latch()
+        createCommitLatch(notification.transactionStringId)
+        createRollbackLatch(notification.transactionStringId)
     }
     /**
      * Will count down the appropriate Latch based on notifications of commit or rollback
@@ -53,29 +52,31 @@ class BlockingTransactionListener extends BaseBlockingEventListener<TransactionN
         }
     }
 
-    boolean waitForTransaction(long timeout = 10000) {
-        waitForEvents(timeout)
-    }
-
-    boolean waitForTransaction(String transactionId, long timeout = 10000) {
-        long started = System.currentTimeMillis()
-        if (commitLatches.containsKey(transactionId)) {
-            return
-        }
-        Thread.sleep 200
-        long elapsed = System.currentTimeMillis() - started
-        waitForTransaction(transactionId, timeout - elapsed)
-    }
-
     boolean waitForCommit(String transactionId, long timeout = 10000) {
-        waitForTransaction(transactionId, timeout)
+        createCommitLatch(transactionId)
         log.debug "Awaiting commit for transaction $transactionId"
         commitLatches[transactionId].await(timeout, TimeUnit.MILLISECONDS)
     }
 
     boolean waitForRollback(String transactionId, long timeout = 10000) {
-        waitForTransaction(transactionId, timeout)
+        createRollbackLatch(transactionId)
         log.debug "Awaiting rollback for transaction $transactionId"
         rollbackLatches[transactionId].await(timeout, TimeUnit.MILLISECONDS)
+    }
+
+    private void createCommitLatch(String transactionId) {
+        synchronized (commitLatches) {
+            if (! commitLatches.containsKey(transactionId)) {
+                commitLatches.put(transactionId, new Latch())
+            }
+        }
+    }
+
+    private void createRollbackLatch(String transactionId) {
+        synchronized (rollbackLatches) {
+            if (! rollbackLatches.containsKey(transactionId)) {
+                rollbackLatches.put(transactionId, new Latch())
+            }
+        }
     }
 }
