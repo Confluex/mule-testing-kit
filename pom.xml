@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.confluex</groupId>
     <artifactId>mule-testing-kit</artifactId>
-    <version>3.6.0.0</version>
+    <version>3.6.0.1-SNAPSHOT</version>
     <name>Mule Testing Extensions</name>
     <url>https://github.com/Confluex/mule-testing-kit</url>
     <description>Tools for making automated testing with Mule ESB easier</description>
