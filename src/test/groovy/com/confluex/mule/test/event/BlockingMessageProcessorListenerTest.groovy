@@ -1,5 +1,6 @@
 package com.confluex.mule.test.event
 
+import com.confluex.mule.test.ConfigurationDetector
 import org.junit.Before
 import org.junit.Test
 import org.mule.api.MuleEvent
@@ -12,10 +13,13 @@ import static org.mockito.Mockito.*
 class BlockingMessageProcessorListenerTest {
 
     BlockingMessageProcessorListener listener
+    ConfigurationDetector configDetector;
 
     @Before
     void initListener() {
-         listener = new BlockingMessageProcessorListener('theProcessorName')
+        listener = new BlockingMessageProcessorListener('theProcessorName')
+        configDetector = new ConfigurationDetector()
+        listener.configurationDetector = configDetector
     }
 
     @Test
@@ -121,7 +125,7 @@ class BlockingMessageProcessorListenerTest {
 
     MessageProcessorNotification makeNotification(String name) {
         def processor = new TestMessageProcessor("stuff to append")
-        processor.name = name
+        configDetector.postProcessAfterInitialization(processor, name)
 
         def muleEvent = mock(MuleEvent)
         when(muleEvent.getMessage()).thenReturn(mock(MuleMessage))

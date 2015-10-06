@@ -1,12 +1,13 @@
 package com.confluex.mule.test.event
 
+import com.confluex.mule.test.BetterFunctionalTestCase
 import groovy.util.logging.Slf4j
 import org.junit.Before
 import org.junit.Test
 import org.mule.tck.junit4.FunctionalTestCase
 
 @Slf4j
-class BlockingTransactionListenerFunctionalTest extends FunctionalTestCase {
+class BlockingTransactionListenerFunctionalTest extends BetterFunctionalTestCase {
 
     public static final int WAIT_TIME = 1500
     BlockingTransactionListener listener
@@ -48,8 +49,7 @@ class BlockingTransactionListenerFunctionalTest extends FunctionalTestCase {
     }
 
     private String publishToFlowAndCaptureTxId(String payload) {
-        BlockingMessageProcessorListener messageListener = new BlockingMessageProcessorListener('txidCapture')
-        muleContext.registerListener messageListener
+        BlockingMessageProcessorListener messageListener = listenForMessageProcessor('txidCapture')
 
         muleContext.client.dispatch('txInbox', payload, [:])
         messageListener.waitForMessages()
