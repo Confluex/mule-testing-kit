@@ -1,5 +1,6 @@
 package com.confluex.mule.test.event
 
+import com.confluex.mule.test.ConfigurationDetector
 import groovy.util.logging.Slf4j
 import org.mule.api.MuleMessage
 import org.mule.api.context.notification.MessageProcessorNotificationListener
@@ -13,6 +14,7 @@ import org.mule.context.notification.MessageProcessorNotification
 @Slf4j
 class BlockingMessageProcessorListener extends BaseBlockingMessageListener<MessageProcessorNotification> implements MessageProcessorNotificationListener<MessageProcessorNotification> {
     final String name
+    ConfigurationDetector configurationDetector
 
     /**
      * Creates a new listener and count down latch.
@@ -44,7 +46,8 @@ class BlockingMessageProcessorListener extends BaseBlockingMessageListener<Messa
 
     protected boolean matchesExpectedProcessorName(MessageProcessorNotification notification) {
         try {
-            return notification.processor.name == name
+            return configurationDetector.beans.containsKey(this.name) &&
+                    configurationDetector.beans[this.name].contains(notification.processor)
         } catch (MissingPropertyException e) {
             return false
         }
@@ -67,5 +70,9 @@ class BlockingMessageProcessorListener extends BaseBlockingMessageListener<Messa
                 log.trace "Ignored MessageProcessorNotification, unable to determine processor name for ${notification.processor.class.name}"
             }
         }
+    }
+
+    public void setConfigurationDetector(ConfigurationDetector configurationDetector) {
+        this.configurationDetector = configurationDetector
     }
 }
