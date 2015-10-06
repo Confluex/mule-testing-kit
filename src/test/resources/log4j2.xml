@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="Console-consoleLog" target="SYSTEM_OUT">
+            <PatternLayout pattern="%-5p %d [%t] %c: %m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <AsyncLogger name="org.apache" level="WARN"/>
+        <AsyncLogger name="org.springframework" level="WARN"/>
+        <AsyncLogger name="org.mule" level="WARN"/>
+        <AsyncLogger name="org.mule.DefaultMuleContext" level="INFO"/>
+        <AsyncLogger name="com.mulesoft" level="WARN" />
+
+        <AsyncLogger name="com.confluex" level="DEBUG" />
+
+        <AsyncRoot level="INFO">
+            <AppenderRef ref="Console-consoleLog"/>
+        </AsyncRoot>
+
+    </Loggers>
+
+</Configuration>

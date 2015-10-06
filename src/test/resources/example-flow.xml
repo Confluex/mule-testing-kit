@@ -1,9 +1,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 ">
 
     <vm:endpoint name="inbox" path="test.inbox"/>
@@ -13,6 +15,8 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     <vm:endpoint name="otherOutbox" path="test.other.outbox" />
     <set-payload name="identityTransformer" value="#[payload]" />
     <set-payload name="otherIdentityTransformer" value="#[payload]" />
+    <set-property name="txidCapture" propertyName="txid" value="#[TransactionCoordination.getInstance().getTransaction().getId()]" />
+
 
     <notifications dynamic="true">
         <notification event="ENDPOINT-MESSAGE" />
@@ -48,7 +52,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <inbound-endpoint ref="txInbox">
             <vm:transaction action="ALWAYS_BEGIN" />
         </inbound-endpoint>
-        <set-property name="txidCapture" propertyName="txid" value="#[TransactionCoordination.getInstance().getTransaction().getId()]" />
+        <processor ref="txidCapture" />
         <logger category="com.confluex.mule.test.transactional-flow" level="INFO" message="Message received: #[payload]"/>
         <choice>
             <when expression="#[payload == 'POISON']">

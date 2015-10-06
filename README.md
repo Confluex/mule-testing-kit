@@ -1,6 +1,25 @@
 # Mule Testing Extensions
 
 ## Setting up using maven
+### Mule 3.7.x
+```xml
+<dependency>
+    <groupId>com.confluex</groupId>
+    <artifactId>mule-testing-kit</artifactId>
+    <version>3.7.0.0</version>
+</dependency>
+```
+
+### Mule 3.6.x
+```xml
+<dependency>
+    <groupId>com.confluex</groupId>
+    <artifactId>mule-testing-kit</artifactId>
+    <version>3.6.0.0</version>
+</dependency>
+```
+
+### Mule 3.5.x
 ```xml
 <dependency>
     <groupId>com.confluex</groupId>
@@ -8,6 +27,10 @@
     <version>1.0.0</version>
 </dependency>
 ```
+
+# Using BetterFunctionalTestCase
+All of the features of mule-testing-kit are provided through inheritance.  You need to extend 
+`BetterFunctionalTestCase` instead of `FunctionalTestCase` to use them.
 
 ## Making sure things are finished
 
@@ -47,12 +70,11 @@ Notice that the endpoints are declared globally, and given names.  We need to in
 using the name of the endpoint we expect our messages to be sent to:
 
 ```java
-public class MyFlowFunctionalTest extends FunctionalTestCase {
+public class MyFlowFunctionalTest extends BetterFunctionalTestCase {
 
     @Test
     public void shouldOutputResultFromSlowBusinessPartner() {
-        BlockingEndpointListener listener = new BlockingEndpointListener("out");
-        muleContext.registerListener(listener);
+        BlockingEndpointListener listener = listenForEndpoint("out");
 
         muleContext.getClient().dispatch("in", "source data", new HashMap<String, Object>());
         // MuleClient.dispatch() returns immediately, while the flow is still processing the message.
@@ -77,9 +99,7 @@ listener to wait for multiple messages:
 
 ```java
 
-    BlockingEndpointListener listener =
-        new BlockingEndpointListener("updateOrderJdbcEndpoint", 16);
-    muleContext.registerListener(listener);
+    BlockingEndpointListener listener = listenForEndpoint("updateOrderJmsEndpoint", 16);
 ```
 
 Subsequent calls to `waitForMessages()` will block until 16 messages are received.
@@ -105,28 +125,10 @@ to enable dynamic notification for `MESSAGE-PROCESSOR` events:
      </notifications>
  </mule>
  ```
-
-**Convenience Methods in BetterFunctionalTestCase**
-
-Because we use these so often, we built a couple of convenience methods into `BetterFunctionalTestCase`:
-
-```java
-import com.confluex.mule.test.BetterFunctionalTestCase;
-
-public class MyFlowFunctionalTest extends BetterFunctionalTestCase {
-
-    @Test
-    public void shouldDoAmazingIntegration() {
-        BlockingMessageProcessorListener mongoInsertListener =
-            listenForMessageProcessor("insertMongoCollectionProcessor");
-        // the convenience method registers the listener with the muleContext for you
-
-        BlockingEndpointListener insertQueryListener =
-            listenForEndpoint("insertQueryEndpoint", 10);
-    }
-}
-
-```
+ 
+ ```java
+ BlockingMessageProcessorListener listener = listenForMessageProcessor("myMongoOperation", 2000);
+ ```
 
 ## Setting up and cleaning up
 
@@ -135,8 +137,7 @@ up afterwards.  When we use these annotations with Mule's `FunctionalTestCase`, 
 initialized before it runs our `@Before` methods, and it makes sure our `@After` methods run before Mule stops.
 
 Sometimes, however, we want to do things before Mule starts or after Mule stops.  For these scenarios, we extend Mule's
-FunctionalTestCase and provide two new annotations: `@BeforeMule` and `@AfterMule`.  In order to take advantage of these,
-you need to extend `BetterFunctionalTestCase` instead of `FunctionalTestCase`.
+FunctionalTestCase and provide two new annotations: `@BeforeMule` and `@AfterMule`.  
 
 _@BeforeMule_
 Methods annotated with `@BeforeMule` will be run after the configuration files are processed and the Spring context is
