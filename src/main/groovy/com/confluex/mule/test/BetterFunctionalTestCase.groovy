@@ -39,7 +39,7 @@ abstract class BetterFunctionalTestCase extends FunctionalTestCase {
             }
             return new SpringXmlConfigurationBuilder([configResources, "testing-kit-config.xml"] as String[]);
         }
-        def multipleConfigResources = getConfigFiles() + "testing-kit-config.xml";
+        def multipleConfigResources = (getConfigFiles() as List) << "testing-kit-config.xml";
         return new SpringXmlConfigurationBuilder(multipleConfigResources as String[]);
     }
 
