@@ -6,7 +6,7 @@
 <dependency>
     <groupId>com.confluex</groupId>
     <artifactId>mule-testing-kit</artifactId>
-    <version>3.7.0.0</version>
+    <version>3.7.0.1</version>
 </dependency>
 ```
 

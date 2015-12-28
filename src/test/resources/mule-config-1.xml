@@ -1,0 +1,23 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+">
+
+    <vm:endpoint name="inbox" path="multiple.test.inbox"/>
+    <vm:endpoint name="stage1" path="multiple.test.stage1"/>
+
+    <notifications dynamic="true">
+        <notification event="ENDPOINT-MESSAGE" />
+    </notifications>
+
+    <flow name="flow-1">
+        <vm:inbound-endpoint ref="inbox" />
+        <logger category="com.confluex.mule.test.multiple" level="INFO" message="Stage 1 Processed" />
+        <vm:outbound-endpoint ref="stage1" />
+    </flow>
+</mule>
